@@ -1,0 +1,2 @@
+server:
+  port: ${ORDER_API_2_PORT}

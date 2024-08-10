@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: UserApi
+  profiles:
+    active: instance1
+  datasource:
+    driver-class-name: ${MYSQL_DRIVER_CLASS_NAME}
+    url: ${MYSQL_URL}/renyibang_user
+    username: ${MYSQL_USERNAME}
+    password: ${MYSQL_PASSWORD}
+  cloud:
+    nacos:
+      discovery:
+        server-addr: ${NACOS_SERVER_ADDR}
+      config:
+        import-check:
+          enabled: false
+    openfeign:
+      okhttp:
+        enabled: true
+    sentinel:
+      transport:
+        dashboard: ${DASHBOARD_PORT}
+      http-method-specify: true

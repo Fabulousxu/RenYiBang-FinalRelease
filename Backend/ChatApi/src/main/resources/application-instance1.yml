@@ -1,0 +1,2 @@
+server:
+  port: ${CHAT_API_1_PORT}

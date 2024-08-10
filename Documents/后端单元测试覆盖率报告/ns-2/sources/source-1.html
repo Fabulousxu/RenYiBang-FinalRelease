@@ -1,0 +1,207 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > ChatServiceImpl</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.renyibang.chatapi.service.impl</a>
+</div>
+
+<h1>Coverage Summary for Class: ChatServiceImpl (com.renyibang.chatapi.service.impl)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ChatServiceImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (30/30)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (44/44)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.renyibang.chatapi.service.impl;
+&nbsp;
+&nbsp;import com.alibaba.fastjson2.JSONArray;
+&nbsp;import com.alibaba.fastjson2.JSONObject;
+&nbsp;import com.renyibang.chatapi.dao.ChatRepository;
+&nbsp;import com.renyibang.chatapi.dao.MessageRepository;
+&nbsp;import com.renyibang.chatapi.entity.Chat;
+&nbsp;import com.renyibang.chatapi.entity.Message;
+&nbsp;import com.renyibang.chatapi.service.ChatService;
+&nbsp;import com.renyibang.global.client.ServiceClient;
+&nbsp;import com.renyibang.global.client.TaskClient;
+&nbsp;import com.renyibang.global.client.UserClient;
+&nbsp;import com.renyibang.global.util.Response;
+&nbsp;import java.time.LocalDateTime;
+&nbsp;import java.util.List;
+&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+&nbsp;import org.springframework.data.domain.Page;
+&nbsp;import org.springframework.data.domain.PageRequest;
+&nbsp;import org.springframework.stereotype.Service;
+&nbsp;
+&nbsp;@Service
+<b class="fc">&nbsp;public class ChatServiceImpl implements ChatService {</b>
+&nbsp;  @Autowired private ChatRepository chatRepository;
+&nbsp;  @Autowired private MessageRepository messageRepository;
+&nbsp;  @Autowired private UserClient userClient;
+&nbsp;  @Autowired private TaskClient taskClient;
+&nbsp;  @Autowired private ServiceClient serviceClient;
+&nbsp;
+&nbsp;  private JSONObject getChatJson(Chat chat, long userId) {
+<b class="fc">&nbsp;    long chatterId = chat.getOfOwnerId() == userId ? chat.getChatterId() : chat.getOfOwnerId();</b>
+<b class="fc">&nbsp;    JSONObject chatterJson = new JSONObject();</b>
+<b class="fc">&nbsp;    JSONObject res = userClient.getUserInfo(chatterId);</b>
+<b class="fc">&nbsp;    if (res.getBooleanValue(&quot;ok&quot;)) chatterJson = res.getJSONObject(&quot;data&quot;);</b>
+<b class="fc">&nbsp;    JSONObject chatJson = JSONObject.from(chat);</b>
+<b class="fc">&nbsp;    chatJson.put(&quot;type&quot;, chat.getType() == 0 ? &quot;task&quot; : &quot;service&quot;);</b>
+<b class="fc">&nbsp;    chatJson.put(&quot;ofId&quot;, chat.getOfId());</b>
+<b class="fc">&nbsp;    chatJson.put(&quot;chatter&quot;, chatterJson);</b>
+<b class="fc">&nbsp;    if (userId == chat.getLastMessageSenderId()) chatJson.put(&quot;unreadCount&quot;, 0);</b>
+<b class="fc">&nbsp;    return chatJson;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public Response getChats(long userId) {
+<b class="fc">&nbsp;    List&lt;Chat&gt; chats =</b>
+<b class="fc">&nbsp;        chatRepository.findByOfOwnerIdOrChatterIdOrderByLastMessageCreatedAtDesc(userId, userId);</b>
+<b class="fc">&nbsp;    chats.sort((a, b) -&gt; b.getLastMessageCreatedAt().compareTo(a.getLastMessageCreatedAt()));</b>
+<b class="fc">&nbsp;    JSONArray chatArray = new JSONArray();</b>
+<b class="fc">&nbsp;    for (Chat chat : chats) chatArray.add(getChatJson(chat, userId));</b>
+<b class="fc">&nbsp;    JSONObject selfJson = new JSONObject();</b>
+<b class="fc">&nbsp;    JSONObject res = userClient.getUserInfo(userId);</b>
+<b class="fc">&nbsp;    if (res.getBooleanValue(&quot;ok&quot;)) selfJson = res.getJSONObject(&quot;data&quot;);</b>
+<b class="fc">&nbsp;    return Response.success(JSONObject.of(&quot;self&quot;, selfJson, &quot;chats&quot;, chatArray));</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public Response initiateChat(long userId, byte type, long ofId) {
+<b class="fc">&nbsp;    Chat chat = chatRepository.findByTypeAndOfIdAndChatterId(type, ofId, userId).orElse(null);</b>
+<b class="fc">&nbsp;    if (chat == null) {</b>
+&nbsp;      JSONObject res =
+<b class="fc">&nbsp;          type == 0 ? taskClient.getTaskOwnerId(ofId) : serviceClient.getServiceOwnerId(ofId);</b>
+<b class="fc">&nbsp;      if (!res.getBooleanValue(&quot;ok&quot;)) return Response.error(res.getString(&quot;message&quot;));</b>
+<b class="fc">&nbsp;      long ofOwnerId = res.getLongValue(&quot;data&quot;);</b>
+<b class="fc">&nbsp;      chat = new Chat(type, ofId, ofOwnerId, userId);</b>
+<b class="fc">&nbsp;      chatRepository.save(chat);</b>
+&nbsp;    }
+<b class="fc">&nbsp;    return Response.success(JSONObject.of(&quot;chatId&quot;, chat.getChatId()));</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public Response getChatHistory(long userId, String chatId, String lastMessageId, int count) {
+<b class="fc">&nbsp;    Chat chat = chatRepository.findById(chatId).orElse(null);</b>
+<b class="fc">&nbsp;    if (chat == null) return Response.error(&quot;聊天不存在&quot;);</b>
+<b class="fc">&nbsp;    if (chat.getOfOwnerId() != userId &amp;&amp; chat.getChatterId() != userId)</b>
+<b class="fc">&nbsp;      return Response.error(&quot;无权查看聊天记录&quot;);</b>
+<b class="fc">&nbsp;    LocalDateTime lastMessageCreatedAt = null;</b>
+<b class="fc">&nbsp;    if (lastMessageId.isEmpty()) {</b>
+<b class="fc">&nbsp;      lastMessageCreatedAt = LocalDateTime.now();</b>
+<b class="fc">&nbsp;      if (chat.getLastMessageSenderId() != userId) {</b>
+<b class="fc">&nbsp;        chat.setUnreadCount(0);</b>
+<b class="fc">&nbsp;        chatRepository.save(chat);</b>
+&nbsp;      }
+&nbsp;    } else {
+<b class="fc">&nbsp;      Message lastMessage = messageRepository.findById(lastMessageId).orElse(null);</b>
+<b class="fc">&nbsp;      lastMessageCreatedAt = lastMessage == null ? LocalDateTime.now() : lastMessage.getCreatedAt();</b>
+&nbsp;    }
+<b class="fc">&nbsp;    Page&lt;Message&gt; messages =</b>
+<b class="fc">&nbsp;        messageRepository.findByChatIdAndCreatedAtBeforeOrderByCreatedAtDesc(</b>
+<b class="fc">&nbsp;            chatId, lastMessageCreatedAt, PageRequest.of(0, count));</b>
+<b class="fc">&nbsp;    return Response.success(messages.stream().toList());</b>
+&nbsp;  }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-08-07 20:24</div>
+</div>
+</body>
+</html>

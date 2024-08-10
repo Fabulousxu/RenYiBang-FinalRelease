@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: ChatApi
+  profiles:
+    active: instance1
+  data:
+    mongodb:
+      uri: ${MONGODB_URL}/renyibang_chat
+  cloud:
+    nacos:
+      discovery:
+        server-addr: ${NACOS_SERVER_ADDR}
+      config:
+        import-check:
+          enabled: false
+    openfeign:
+      okhttp:
+        enabled: true
+    sentinel:
+      transport:
+        dashboard: ${DASHBOARD_PORT}
+      http-method-specify: true

@@ -1,0 +1,139 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > TaskService</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.renyibang.taskapi.service</a>
+</div>
+
+<h1>Coverage Summary for Class: TaskService (com.renyibang.taskapi.service)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">TaskService</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.renyibang.taskapi.service;
+&nbsp;
+&nbsp;import com.alibaba.fastjson2.JSONObject;
+&nbsp;import org.springframework.data.domain.Pageable;
+&nbsp;import org.springframework.stereotype.Service;
+&nbsp;
+&nbsp;@Service
+&nbsp;public interface TaskService {
+&nbsp;  JSONObject searchTaskByPaging(
+&nbsp;      String keyword,
+&nbsp;      Pageable pageable,
+&nbsp;      String timeBegin,
+&nbsp;      String timeEnd,
+&nbsp;      long priceLow,
+&nbsp;      long priceHigh,
+&nbsp;      long userId);
+&nbsp;
+&nbsp;  JSONObject getTaskInfo(long taskId, long userId);
+&nbsp;
+&nbsp;  JSONObject getTaskComments(long taskId, Pageable pageable, long userId);
+&nbsp;
+&nbsp;  JSONObject getTaskMessages(long taskId, Pageable pageable, long userId);
+&nbsp;
+&nbsp;  JSONObject likeComment(long taskCommentId, long likerId);
+&nbsp;
+&nbsp;  JSONObject unlikeComment(long taskCommentId, long unlikerId);
+&nbsp;
+&nbsp;  JSONObject likeMessage(long taskMessageId, long likerId);
+&nbsp;
+&nbsp;  JSONObject unlikeMessage(long taskMessageId, long unlikerId);
+&nbsp;
+&nbsp;  JSONObject collectTask(long taskId, long collectorId);
+&nbsp;
+&nbsp;  JSONObject uncollectTask(long taskId, long uncollectorId);
+&nbsp;
+&nbsp;  JSONObject accessTask(long taskId, long accessorId);
+&nbsp;
+&nbsp;  JSONObject unaccessTask(long taskId, long unaccessorId);
+&nbsp;
+&nbsp;  JSONObject publishMessage(long taskId, long userId, JSONObject body);
+&nbsp;
+&nbsp;  JSONObject deleteMessage(long taskMessageId, long userId);
+&nbsp;
+&nbsp;  JSONObject publishComment(long taskId, long userId, JSONObject body);
+&nbsp;
+&nbsp;  JSONObject deleteComment(long taskCommentId, long userId);
+&nbsp;
+&nbsp;  JSONObject publishTask(long userId, JSONObject body);
+&nbsp;
+&nbsp;  JSONObject getTaskDtoById(Long taskId);
+&nbsp;
+&nbsp;  JSONObject getTaskOwnerId(long taskId);
+&nbsp;
+&nbsp;  JSONObject getMyTask(Pageable pageable, long userId);
+&nbsp;
+&nbsp;  JSONObject getMyAccessedTask(Pageable pageable, long userId);
+&nbsp;
+&nbsp;  JSONObject getTaskAccessorInfo(long taskId, long userId, Pageable pageable);
+&nbsp;
+&nbsp;  JSONObject cancelTask(long taskId, long userId);
+&nbsp;
+&nbsp;  JSONObject confirmAccessors(long taskId, long userId, JSONObject body);
+&nbsp;
+&nbsp;  JSONObject getTaskAccessorSuccess(long taskId, long userId, Pageable pageable);
+&nbsp;
+&nbsp;  JSONObject getTaskAccessorFail(long taskId, long userId, Pageable pageable);
+&nbsp;
+&nbsp;  JSONObject denyAccessors(long taskId, long userId, JSONObject body);
+&nbsp;
+&nbsp;  JSONObject getMyCollect(Pageable pageable, long userId);
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-08-07 20:24</div>
+</div>
+</body>
+</html>

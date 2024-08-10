@@ -1,0 +1,376 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > ServiceController</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.renyibang.serviceapi.controller</a>
+</div>
+
+<h1>Coverage Summary for Class: ServiceController (com.renyibang.serviceapi.controller)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ServiceController</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (29/29)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (40/40)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (57/57)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.renyibang.serviceapi.controller;
+&nbsp;
+&nbsp;import com.alibaba.fastjson2.JSONObject;
+&nbsp;import com.renyibang.serviceapi.service.ServiceService;
+&nbsp;import com.renyibang.serviceapi.util.ResponseUtil;
+&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+&nbsp;import org.springframework.data.domain.PageRequest;
+&nbsp;import org.springframework.data.domain.Pageable;
+&nbsp;import org.springframework.data.domain.Sort;
+&nbsp;import org.springframework.web.bind.annotation.*;
+&nbsp;
+&nbsp;import java.util.Objects;
+&nbsp;
+&nbsp;@RestController
+&nbsp;@RequestMapping(&quot;/api/service&quot;)
+<b class="fc">&nbsp;public class ServiceController {</b>
+&nbsp;    @Autowired ServiceService serviceService;
+&nbsp;
+&nbsp;    @GetMapping(&quot;/search&quot;)
+&nbsp;    public JSONObject searchService(String keyword,
+&nbsp;                                    int pageSize,
+&nbsp;                                    int pageIndex,
+&nbsp;                                    String order,
+&nbsp;                                    String timeBegin,
+&nbsp;                                    String timeEnd,
+&nbsp;                                    long priceLow,
+&nbsp;                                    long priceHigh,
+&nbsp;                                    @RequestHeader long userId)
+&nbsp;    {
+&nbsp;        Sort sort;
+&nbsp;
+<b class="fc">&nbsp;        if(Objects.equals(order, &quot;time&quot;) &amp;&amp; !keyword.isEmpty())</b>
+&nbsp;        {
+<b class="fc">&nbsp;            sort = Sort.by(&quot;created_at&quot;).descending();</b>
+<b class="fc">&nbsp;        } else if(Objects.equals(order, &quot;time&quot;))</b>
+&nbsp;        {
+<b class="fc">&nbsp;            sort = Sort.by(&quot;createdAt&quot;).descending();</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        else if (Objects.equals(order, &quot;rating&quot;))</b>
+&nbsp;        {
+<b class="fc">&nbsp;            sort = Sort.by(&quot;rating&quot;).descending();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        else
+&nbsp;        {
+<b class="fc">&nbsp;            return ResponseUtil.error(&quot;排序类型错误&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        if (pageSize &lt;= 0 || pageIndex &lt; 0) return ResponseUtil.error(&quot;分页错误&quot;);</b>
+<b class="fc">&nbsp;        Pageable pageable = PageRequest.of(pageIndex, pageSize, sort);</b>
+&nbsp;
+<b class="fc">&nbsp;        return serviceService.searchServiceByPaging(keyword, pageable, timeBegin, timeEnd, priceLow, priceHigh, userId);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping(&quot;/{serviceId}&quot;)
+&nbsp;    public JSONObject getServiceInfo(@PathVariable long serviceId, @RequestHeader long userId)
+&nbsp;    {
+<b class="fc">&nbsp;        return serviceService.getServiceInfo(serviceId, userId);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping(&quot;/{serviceId}/comment&quot;)
+&nbsp;    public JSONObject getServiceComment(@PathVariable long serviceId, int pageSize, int pageIndex, String order, @RequestHeader long userId)
+&nbsp;    {
+&nbsp;        Sort sort;
+&nbsp;
+<b class="fc">&nbsp;        if(Objects.equals(order, &quot;likes&quot;))</b>
+&nbsp;        {
+<b class="fc">&nbsp;            sort = Sort.by(&quot;likedNumber&quot;).descending();</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        else if(Objects.equals(order, &quot;time&quot;))</b>
+&nbsp;        {
+<b class="fc">&nbsp;            sort = Sort.by(&quot;createdAt&quot;).descending();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        else
+&nbsp;        {
+<b class="fc">&nbsp;            return ResponseUtil.error(&quot;排序类型错误&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        if (pageSize &lt;= 0 || pageIndex &lt; 0) return ResponseUtil.error(&quot;分页错误&quot;);</b>
+<b class="fc">&nbsp;        Pageable pageable = PageRequest.of(pageIndex, pageSize, sort);</b>
+&nbsp;
+<b class="fc">&nbsp;        return serviceService.getServiceComments(serviceId, pageable, userId);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping(&quot;/{serviceId}/message&quot;)
+&nbsp;    public JSONObject getServiceMessage(@PathVariable long serviceId, int pageSize, int pageIndex, String order, @RequestHeader long userId)
+&nbsp;    {
+&nbsp;        Sort sort;
+&nbsp;
+<b class="fc">&nbsp;        if(Objects.equals(order, &quot;likes&quot;))</b>
+&nbsp;        {
+<b class="fc">&nbsp;            sort = Sort.by(&quot;likedNumber&quot;).descending();</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        else if(Objects.equals(order, &quot;time&quot;))</b>
+&nbsp;        {
+<b class="fc">&nbsp;            sort = Sort.by(&quot;createdAt&quot;).descending();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        else
+&nbsp;        {
+<b class="fc">&nbsp;            return ResponseUtil.error(&quot;排序类型错误&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        if (pageSize &lt;= 0 || pageIndex &lt; 0) return ResponseUtil.error(&quot;分页错误&quot;);</b>
+<b class="fc">&nbsp;        Pageable pageable = PageRequest.of(pageIndex, pageSize, sort);</b>
+&nbsp;
+<b class="fc">&nbsp;        return serviceService.getServiceMessages(serviceId, pageable, userId);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @PutMapping(&quot;/comment/{serviceCommentId}/like&quot;)
+&nbsp;    public JSONObject likeComment(@PathVariable long serviceCommentId, @RequestHeader long userId)
+&nbsp;    {
+<b class="fc">&nbsp;        return serviceService.likeComment(serviceCommentId, userId);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @DeleteMapping(&quot;/comment/{serviceCommentId}/unlike&quot;)
+&nbsp;    public JSONObject unlikeComment(@PathVariable long serviceCommentId, @RequestHeader long userId)
+&nbsp;    {
+<b class="fc">&nbsp;        return serviceService.unlikeComment(serviceCommentId, userId);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @PutMapping(&quot;/message/{serviceMessageId}/like&quot;)
+&nbsp;    public JSONObject likeMessage(@PathVariable long serviceMessageId, @RequestHeader long userId)
+&nbsp;    {
+<b class="fc">&nbsp;        return serviceService.likeMessage(serviceMessageId, userId);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @DeleteMapping(&quot;/message/{serviceMessageId}/unlike&quot;)
+&nbsp;    public JSONObject unlikeMessage(@PathVariable long serviceMessageId, @RequestHeader long userId)
+&nbsp;    {
+<b class="fc">&nbsp;        return serviceService.unlikeMessage(serviceMessageId, userId);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @PutMapping(&quot;/{serviceId}/collect&quot;)
+&nbsp;    public JSONObject collectService(@PathVariable long serviceId, @RequestHeader long userId)
+&nbsp;    {
+<b class="fc">&nbsp;        return serviceService.collectService(serviceId, userId);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @DeleteMapping(&quot;/{serviceId}/uncollect&quot;)
+&nbsp;    public JSONObject uncollectService(@PathVariable long serviceId, @RequestHeader long userId)
+&nbsp;    {
+<b class="fc">&nbsp;        return serviceService.uncollectService(serviceId, userId);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @PutMapping(&quot;/{serviceId}/access&quot;)
+&nbsp;    public JSONObject accessService(@PathVariable long serviceId, @RequestHeader long userId)
+&nbsp;    {
+<b class="fc">&nbsp;        return serviceService.accessService(serviceId, userId);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @DeleteMapping(&quot;/{serviceId}/unaccess&quot;)
+&nbsp;    public JSONObject unaccessService(@PathVariable long serviceId, @RequestHeader long userId)
+&nbsp;    {
+<b class="fc">&nbsp;        return serviceService.unaccessService(serviceId, userId);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @PutMapping(&quot;/{serviceId}/message&quot;)
+&nbsp;    public JSONObject publishMessage(@PathVariable long serviceId, @RequestBody JSONObject body, @RequestHeader long userId)
+&nbsp;    {
+<b class="fc">&nbsp;        return serviceService.publishMessage(serviceId, userId, body);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @DeleteMapping(&quot;/message/{serviceMessageId}&quot;)
+&nbsp;    public JSONObject deleteMessage(@PathVariable long serviceMessageId, @RequestHeader long userId)
+&nbsp;    {
+<b class="fc">&nbsp;        return serviceService.deleteMessage(serviceMessageId, userId);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @PutMapping(&quot;/{serviceId}/comment&quot;)
+&nbsp;    public JSONObject publishComment(@PathVariable long serviceId, @RequestBody JSONObject body, @RequestHeader long userId)
+&nbsp;    {
+<b class="fc">&nbsp;        return serviceService.publishComment(serviceId, userId, body);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @DeleteMapping(&quot;/comment/{serviceCommentId}&quot;)
+&nbsp;    public JSONObject deleteComment(@PathVariable long serviceCommentId, @RequestHeader long userId)
+&nbsp;    {
+<b class="fc">&nbsp;        return serviceService.deleteComment(serviceCommentId, userId);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @PostMapping(&quot;/issue&quot;)
+&nbsp;    public JSONObject publishService(@RequestBody JSONObject body, @RequestHeader long userId)
+&nbsp;    {
+<b class="fc">&nbsp;        return serviceService.publishService(userId, body);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // 以下为后端模块API接口
+&nbsp;
+&nbsp;    //order模块调用
+&nbsp;    @GetMapping(&quot;/getService/{serviceId}&quot;)
+&nbsp;    public JSONObject getServiceDtoById(@PathVariable long serviceId)
+&nbsp;    {
+<b class="fc">&nbsp;        return serviceService.getServiceDtoById(serviceId);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    //chat模块调用
+&nbsp;    @GetMapping(&quot;/{serviceId}/ownerId&quot;)
+&nbsp;    public JSONObject getServiceOwnerId(@PathVariable long serviceId)
+&nbsp;    {
+<b class="fc">&nbsp;        return serviceService.getServiceOwnerId(serviceId);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping(&quot;/initiator/self&quot;)
+&nbsp;    public JSONObject getMyService(int pageSize, int pageIndex, @RequestHeader long userId)
+&nbsp;    {
+<b class="fc">&nbsp;        if (pageSize &lt;= 0 || pageIndex &lt; 0) return ResponseUtil.error(&quot;分页错误&quot;);</b>
+<b class="fc">&nbsp;        Pageable pageable = PageRequest.of(pageIndex, pageSize);</b>
+<b class="fc">&nbsp;        return serviceService.getMyService(pageable, userId);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping(&quot;/recipient/self&quot;)
+&nbsp;    public JSONObject getMyAccessedService(int pageSize, int pageIndex, @RequestHeader long userId)
+&nbsp;    {
+<b class="fc">&nbsp;        if (pageSize &lt;= 0 || pageIndex &lt; 0) return ResponseUtil.error(&quot;分页错误&quot;);</b>
+<b class="fc">&nbsp;        Pageable pageable = PageRequest.of(pageIndex, pageSize);</b>
+<b class="fc">&nbsp;        return serviceService.getMyAccessedService(pageable, userId);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping(&quot;/{serviceId}/select/info&quot;)
+&nbsp;    public JSONObject getServiceAccessorInfo(@PathVariable long serviceId, @RequestHeader long userId, int pageSize, int pageIndex)
+&nbsp;    {
+<b class="fc">&nbsp;        return serviceService.getServiceAccessorInfo(serviceId, userId, PageRequest.of(pageIndex, pageSize));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping(&quot;/{serviceId}/select/success&quot;)
+&nbsp;    public JSONObject getServiceAccessorSuccess(@PathVariable long serviceId, @RequestHeader long userId, int pageSize, int pageIndex) {
+<b class="fc">&nbsp;        return serviceService.getServiceAccessorSuccess(serviceId, userId, PageRequest.of(pageIndex, pageSize));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping(&quot;/{serviceId}/select/fail&quot;)
+&nbsp;    public JSONObject getServiceAccessorFail(@PathVariable long serviceId, @RequestHeader long userId, int pageSize, int pageIndex) {
+<b class="fc">&nbsp;        return serviceService.getServiceAccessorFail(serviceId, userId, PageRequest.of(pageIndex, pageSize));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @DeleteMapping(&quot;/{serviceId}/cancel&quot;)
+&nbsp;    public JSONObject cancelService(@PathVariable long serviceId, @RequestHeader long userId) {
+<b class="fc">&nbsp;        return serviceService.cancelService(serviceId, userId);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @PutMapping(&quot;/{serviceId}/select/confirm&quot;)
+&nbsp;    public JSONObject confirmAccessors(@PathVariable long serviceId, @RequestHeader long userId, @RequestBody JSONObject body) {
+<b class="fc">&nbsp;        return serviceService.confirmAccessors(serviceId, userId, body);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @PutMapping(&quot;/{serviceId}/select/deny&quot;)
+&nbsp;    public JSONObject denyAccessors(@PathVariable long serviceId, @RequestHeader long userId, @RequestBody JSONObject body) {
+<b class="fc">&nbsp;        return serviceService.denyAccessors(serviceId, userId, body);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping(&quot;/mycollect&quot;)
+&nbsp;    public JSONObject getMyCollect(int pageSize, int pageIndex, @RequestHeader long userId) {
+<b class="fc">&nbsp;        if (pageSize &lt;= 0 || pageIndex &lt; 0) return ResponseUtil.error(&quot;分页错误&quot;);</b>
+<b class="fc">&nbsp;        return serviceService.getMyCollect(PageRequest.of(pageIndex, pageSize), userId);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-08-07 20:24</div>
+</div>
+</body>
+</html>

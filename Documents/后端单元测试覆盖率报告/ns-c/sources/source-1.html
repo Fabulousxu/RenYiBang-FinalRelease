@@ -1,0 +1,124 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > OrderService</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.renyibang.orderapi.service</a>
+</div>
+
+<h1>Coverage Summary for Class: OrderService (com.renyibang.orderapi.service)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">OrderService</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.renyibang.orderapi.service;
+&nbsp;import com.renyibang.orderapi.dto.OrderDTO;
+&nbsp;import com.renyibang.orderapi.entity.Order;
+&nbsp;import com.renyibang.orderapi.enums.OrderStatus;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;import org.springframework.data.util.Pair;
+&nbsp;
+&nbsp;public interface OrderService {
+&nbsp;	List&lt;OrderDTO&gt; findByOwnerIdAndType(long ownerId, Byte type);
+&nbsp;
+&nbsp;	List&lt;OrderDTO&gt; findByAccessorIdAndType(long accessorId, Byte type);
+&nbsp;
+&nbsp;	List&lt;OrderDTO&gt; findByItemIdAndType(long itemId, Byte type);
+&nbsp;
+&nbsp;	List&lt;OrderDTO&gt; findByStatusAndType(OrderStatus status, Byte type);
+&nbsp;
+&nbsp;	// 根据订单ID查找订单
+&nbsp;	OrderDTO findById(long orderId);
+&nbsp;
+&nbsp;	// 返回所有订单
+&nbsp;	List&lt;OrderDTO&gt; findAllOrders();
+&nbsp;
+&nbsp;	// 生成初始订单
+&nbsp;	boolean createOrder(long taskId, long ownerId, List&lt;Long&gt; accessors, long cost, Byte type);
+&nbsp;
+&nbsp;	OrderDTO mapOrderToOrderDTO(Order order);
+&nbsp;
+&nbsp;	void mapOrdersToOrderDTOs(List&lt;Order&gt; orders, List&lt;OrderDTO&gt; orderDTOs);
+&nbsp;
+&nbsp;	// 标记订单状态
+&nbsp;	Pair&lt;Boolean, String&gt; markOrderStatus(long orderId, long userId, OrderStatus status);
+&nbsp;
+&nbsp;	boolean setOrderStatusForce(long orderId, OrderStatus status);
+&nbsp;
+&nbsp;	// 校验订单是否存在
+&nbsp;	boolean checkOrderExist(long orderId);
+&nbsp;
+&nbsp;	// 校验订单状态是否为指定状态
+&nbsp;	boolean checkOrderStatus(long orderId, OrderStatus status);
+&nbsp;
+&nbsp;	boolean payOrder(Order order);
+&nbsp;
+&nbsp;	boolean completeOrder(Order order);
+&nbsp;
+&nbsp;	boolean confirmOrder(Order order);
+&nbsp;
+&nbsp;	boolean cancelOrder(Order order);
+&nbsp;
+&nbsp;	// 用户转账
+&nbsp;	boolean modifyUserBalance(long userId, long amount);
+&nbsp;}
+&nbsp;	
+&nbsp;	
+&nbsp;	
+&nbsp;	
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-08-07 20:24</div>
+</div>
+</body>
+</html>

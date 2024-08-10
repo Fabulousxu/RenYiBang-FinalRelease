@@ -1,0 +1,443 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > OrderServiceImpl</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.renyibang.orderapi.service.ServiceImpl</a>
+</div>
+
+<h1>Coverage Summary for Class: OrderServiceImpl (com.renyibang.orderapi.service.ServiceImpl)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">OrderServiceImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (19/19)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (104/104)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (150/150)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.renyibang.orderapi.service.ServiceImpl;
+&nbsp;
+&nbsp;import com.alibaba.fastjson2.JSONObject;
+&nbsp;import com.renyibang.global.client.ServiceClient;
+&nbsp;import com.renyibang.global.client.TaskClient;
+&nbsp;import com.renyibang.global.client.UserClient;
+&nbsp;import com.renyibang.orderapi.dao.OrderDao;
+&nbsp;import com.renyibang.orderapi.dto.OrderDTO;
+&nbsp;import com.renyibang.orderapi.entity.Order;
+&nbsp;import com.renyibang.orderapi.enums.OrderStatus;
+&nbsp;import com.renyibang.orderapi.service.OrderService;
+&nbsp;import java.util.ArrayList;
+&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+&nbsp;import org.springframework.data.util.Pair;
+&nbsp;import org.springframework.stereotype.Service;
+&nbsp;
+&nbsp;import com.renyibang.global.dto.TaskDTO;
+&nbsp;import com.renyibang.global.dto.ServiceDTO;
+&nbsp;import com.renyibang.global.dto.UserDTO;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;@Service
+<b class="fc">&nbsp;public class OrderServiceImpl implements OrderService {</b>
+&nbsp;  @Autowired private OrderDao orderDao;
+&nbsp;
+&nbsp;  // 使用openfeign替代restTemplate
+&nbsp;  @Autowired private UserClient userClient;
+&nbsp;  @Autowired private TaskClient taskClient;
+&nbsp;  @Autowired private ServiceClient serviceClient;
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public List&lt;OrderDTO&gt; findByOwnerIdAndType(long ownerId, Byte type) {
+<b class="fc">&nbsp;    List&lt;Order&gt; orders = orderDao.findByOwnerIdAndType(ownerId, type);</b>
+<b class="fc">&nbsp;    List&lt;OrderDTO&gt; orderDTOs = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;    // 向User module请求owner信息
+<b class="fc">&nbsp;    JSONObject result = userClient.getUserById(ownerId);</b>
+<b class="fc">&nbsp;    if(!result.getBoolean(&quot;ok&quot;)) return orderDTOs;</b>
+<b class="fc">&nbsp;    UserDTO owner = result.getObject(&quot;data&quot;, UserDTO.class);</b>
+&nbsp;
+<b class="fc">&nbsp;    for (Order order : orders) {</b>
+<b class="fc">&nbsp;      OrderDTO orderDTO = new OrderDTO(order);</b>
+&nbsp;
+&nbsp;      //  向User module请求accessor信息
+<b class="fc">&nbsp;      result = userClient.getUserById(order.getAccessorId());</b>
+<b class="fc">&nbsp;      if(!result.getBoolean(&quot;ok&quot;)) return orderDTOs;</b>
+<b class="fc">&nbsp;      UserDTO accessor = result.getObject(&quot;data&quot;, UserDTO.class);</b>
+&nbsp;
+<b class="fc">&nbsp;      if (type == 0) {</b>
+&nbsp;        // 向Task module请求task信息
+<b class="fc">&nbsp;        result = taskClient.getTaskById(order.getItemId());</b>
+<b class="fc">&nbsp;        if(!result.getBoolean(&quot;ok&quot;)) continue;</b>
+<b class="fc">&nbsp;        TaskDTO task = result.getObject(&quot;data&quot;, TaskDTO.class);</b>
+<b class="fc">&nbsp;        orderDTO.setTask(task);</b>
+&nbsp;      } else {
+&nbsp;        // 向Service module请求service信息
+<b class="fc">&nbsp;        result = serviceClient.getServiceById(order.getItemId());</b>
+<b class="fc">&nbsp;        if(!result.getBoolean(&quot;ok&quot;)) continue;</b>
+<b class="fc">&nbsp;        ServiceDTO service = result.getObject(&quot;data&quot;, ServiceDTO.class);</b>
+<b class="fc">&nbsp;        orderDTO.setService(service);</b>
+&nbsp;      }
+&nbsp;
+<b class="fc">&nbsp;      orderDTO.setOwner(owner);</b>
+<b class="fc">&nbsp;      orderDTO.setAccessor(accessor);</b>
+<b class="fc">&nbsp;      orderDTOs.add(orderDTO);</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    return orderDTOs;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public List&lt;OrderDTO&gt; findByAccessorIdAndType(long accessorId, Byte type) {
+<b class="fc">&nbsp;    List&lt;Order&gt; orders = orderDao.findByAccessorIdAndType(accessorId, type);</b>
+<b class="fc">&nbsp;    List&lt;OrderDTO&gt; orderDTOs = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;    // 向User module请求accessor信息
+<b class="fc">&nbsp;    JSONObject result = userClient.getUserById(accessorId);</b>
+<b class="fc">&nbsp;    if(!result.getBoolean(&quot;ok&quot;)) return orderDTOs;</b>
+<b class="fc">&nbsp;    UserDTO accessor = result.getObject(&quot;data&quot;, UserDTO.class);</b>
+&nbsp;
+<b class="fc">&nbsp;    for (Order order : orders) {</b>
+<b class="fc">&nbsp;      OrderDTO orderDTO = new OrderDTO(order);</b>
+&nbsp;
+&nbsp;      //  向User module请求owner信息
+<b class="fc">&nbsp;      result = userClient.getUserById(order.getOwnerId());</b>
+<b class="fc">&nbsp;      if(!result.getBoolean(&quot;ok&quot;)) return orderDTOs;</b>
+<b class="fc">&nbsp;      UserDTO owner = result.getObject(&quot;data&quot;, UserDTO.class);</b>
+&nbsp;
+<b class="fc">&nbsp;      if (type == 0) {</b>
+&nbsp;        // 向Task module请求task信息
+<b class="fc">&nbsp;        result = taskClient.getTaskById(order.getItemId());</b>
+<b class="fc">&nbsp;        if(!result.getBoolean(&quot;ok&quot;)) continue;</b>
+<b class="fc">&nbsp;        TaskDTO task = result.getObject(&quot;data&quot;, TaskDTO.class);</b>
+<b class="fc">&nbsp;        orderDTO.setTask(task);</b>
+&nbsp;      } else {
+&nbsp;        // 向Service module请求service信息
+<b class="fc">&nbsp;        result = serviceClient.getServiceById(order.getItemId());</b>
+<b class="fc">&nbsp;        if(!result.getBoolean(&quot;ok&quot;)) continue;</b>
+<b class="fc">&nbsp;        ServiceDTO service = result.getObject(&quot;data&quot;, ServiceDTO.class);</b>
+<b class="fc">&nbsp;        orderDTO.setService(service);</b>
+&nbsp;      }
+&nbsp;
+<b class="fc">&nbsp;      orderDTO.setOwner(owner);</b>
+<b class="fc">&nbsp;      orderDTO.setAccessor(accessor);</b>
+<b class="fc">&nbsp;      orderDTOs.add(orderDTO);</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    return orderDTOs;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public List&lt;OrderDTO&gt; findByItemIdAndType(long taskId, Byte type) {
+<b class="fc">&nbsp;    List&lt;Order&gt; orders = orderDao.findByItemIdAndType(taskId, type);</b>
+<b class="fc">&nbsp;    List&lt;OrderDTO&gt; orderDTOs = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="fc">&nbsp;    this.mapOrdersToOrderDTOs(orders, orderDTOs);</b>
+&nbsp;
+<b class="fc">&nbsp;    return orderDTOs;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public List&lt;OrderDTO&gt; findByStatusAndType(OrderStatus status, Byte type) {
+<b class="fc">&nbsp;    List&lt;Order&gt; orders = orderDao.findByStatusAndType(status, type);</b>
+<b class="fc">&nbsp;    List&lt;OrderDTO&gt; orderDTOs = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="fc">&nbsp;    this.mapOrdersToOrderDTOs(orders, orderDTOs);</b>
+&nbsp;
+<b class="fc">&nbsp;    return orderDTOs;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public OrderDTO findById(long orderId) {
+<b class="fc">&nbsp;    Order order = orderDao.findById(orderId);</b>
+<b class="fc">&nbsp;    if (order == null) return null;</b>
+&nbsp;
+<b class="fc">&nbsp;    return mapOrderToOrderDTO(order);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public List&lt;OrderDTO&gt; findAllOrders() {
+<b class="fc">&nbsp;    List&lt;Order&gt; orders = orderDao.findAll();</b>
+<b class="fc">&nbsp;    List&lt;OrderDTO&gt; orderDTOs = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="fc">&nbsp;    this.mapOrdersToOrderDTOs(orders, orderDTOs);</b>
+&nbsp;
+<b class="fc">&nbsp;    return orderDTOs;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public boolean createOrder(long taskId, long ownerId, List&lt;Long&gt; accessors, long cost, Byte type) {
+&nbsp;    // 校验：是否存在
+&nbsp;    // 任务， owner, accessor
+&nbsp;    // cost是否为正数
+&nbsp;
+&nbsp;    //  taskFeign / serviceFeign
+<b class="fc">&nbsp;    if (type == 0) {</b>
+<b class="fc">&nbsp;      JSONObject result = taskClient.getTaskById(taskId);</b>
+<b class="fc">&nbsp;      if(!result.getBoolean(&quot;ok&quot;)) throw new IllegalArgumentException(&quot;任务不存在&quot;);</b>
+&nbsp;    } else {
+<b class="fc">&nbsp;      JSONObject result = serviceClient.getServiceById(taskId);</b>
+<b class="fc">&nbsp;      if(!result.getBoolean(&quot;ok&quot;)) throw new IllegalArgumentException(&quot;服务不存在&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // userFeign
+<b class="fc">&nbsp;    JSONObject result = userClient.getUserById(ownerId);</b>
+<b class="fc">&nbsp;    if(!result.getBoolean(&quot;ok&quot;)) throw new IllegalArgumentException(&quot;发起者不存在&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;    if (cost &lt;= 0) throw new IllegalArgumentException(&quot;金额必须为正数&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;    for(long accessorId : accessors) {</b>
+<b class="fc">&nbsp;      result = userClient.getUserById(accessorId);</b>
+<b class="fc">&nbsp;      if(!result.getBoolean(&quot;ok&quot;)) throw new IllegalArgumentException(&quot;接收者不存在&quot;);</b>
+&nbsp;
+&nbsp;      // Create a new Order
+<b class="fc">&nbsp;      Order order = new Order();</b>
+<b class="fc">&nbsp;      order.setItemId(taskId);</b>
+<b class="fc">&nbsp;      order.setOwnerId(ownerId);</b>
+<b class="fc">&nbsp;      order.setAccessorId(accessorId);</b>
+<b class="fc">&nbsp;      order.setCost(cost);</b>
+<b class="fc">&nbsp;      order.setStatus(OrderStatus.UNPAID);</b>
+<b class="fc">&nbsp;      order.setType(type);</b>
+&nbsp;
+&nbsp;      // Save the Order and return its ID
+<b class="fc">&nbsp;      orderDao.save(order);</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    return true;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public boolean setOrderStatusForce(long orderId, OrderStatus status) {
+<b class="fc">&nbsp;    Order order = orderDao.findById(orderId);</b>
+<b class="fc">&nbsp;    if (order == null) return false;</b>
+&nbsp;
+<b class="fc">&nbsp;    order.setStatus(status);</b>
+<b class="fc">&nbsp;    orderDao.save(order);</b>
+<b class="fc">&nbsp;    return true;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public boolean checkOrderExist(long orderId) {
+<b class="fc">&nbsp;    return orderDao.existsById(orderId);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public boolean checkOrderStatus(long orderId, OrderStatus status) {
+<b class="fc">&nbsp;    Order order = orderDao.findById(orderId);</b>
+<b class="fc">&nbsp;    if (order == null) return false;</b>
+<b class="fc">&nbsp;    return order.getStatus() == status;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public boolean payOrder(Order order) {
+&nbsp;    // 获得任务发布者
+<b class="fc">&nbsp;    long ownerId = order.getOwnerId();</b>
+<b class="fc">&nbsp;    if(!this.modifyUserBalance(ownerId, -order.getCost())) return false;</b>
+&nbsp;
+&nbsp;    // 修改订单状态
+<b class="fc">&nbsp;    order.setStatus(OrderStatus.IN_PROGRESS);</b>
+<b class="fc">&nbsp;    orderDao.save(order);</b>
+<b class="fc">&nbsp;    return true;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public boolean completeOrder(Order order) {
+<b class="fc">&nbsp;    order.setStatus(OrderStatus.COMPLETED);</b>
+<b class="fc">&nbsp;    orderDao.save(order);</b>
+<b class="fc">&nbsp;    return true;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public boolean confirmOrder(Order order) {
+<b class="fc">&nbsp;    order.setStatus(OrderStatus.CONFIRMED);</b>
+&nbsp;    // 将帐号余额增加
+<b class="fc">&nbsp;    if(!this.modifyUserBalance(order.getAccessorId(), order.getCost())) return false;</b>
+<b class="fc">&nbsp;    orderDao.save(order);</b>
+<b class="fc">&nbsp;    return true;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public boolean cancelOrder(Order order) {
+<b class="fc">&nbsp;    order.setStatus(OrderStatus.CANCELLED);</b>
+&nbsp;    // 将帐号余额增加
+<b class="fc">&nbsp;    if(!this.modifyUserBalance(order.getOwnerId(), order.getCost())) return false;</b>
+<b class="fc">&nbsp;    orderDao.save(order);</b>
+<b class="fc">&nbsp;    return true;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public boolean modifyUserBalance(long userId, long amount) {
+&nbsp;    // 向User module请求用户信息
+<b class="fc">&nbsp;    JSONObject result = userClient.getUserById(userId);</b>
+<b class="fc">&nbsp;    if(!result.getBoolean(&quot;ok&quot;)) return false;</b>
+<b class="fc">&nbsp;    UserDTO user = result.getObject(&quot;data&quot;, UserDTO.class);</b>
+&nbsp;
+<b class="fc">&nbsp;    user.setBalance(user.getBalance() + amount);</b>
+<b class="fc">&nbsp;    result = userClient.updateUser(user);</b>
+<b class="fc">&nbsp;		return result.getBoolean(&quot;ok&quot;);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public OrderDTO mapOrderToOrderDTO(Order order) {
+<b class="fc">&nbsp;    OrderDTO orderDTO = new OrderDTO(order);</b>
+&nbsp;
+&nbsp;    //  向User module请求owner信息
+<b class="fc">&nbsp;    JSONObject result = userClient.getUserById(order.getOwnerId());</b>
+<b class="fc">&nbsp;    if(!result.getBoolean(&quot;ok&quot;)) return null;</b>
+<b class="fc">&nbsp;    UserDTO owner = result.getObject(&quot;data&quot;, UserDTO.class);</b>
+&nbsp;
+&nbsp;    //  向User module请求accessor信息
+<b class="fc">&nbsp;    result = userClient.getUserById(order.getAccessorId());</b>
+<b class="fc">&nbsp;    if(!result.getBoolean(&quot;ok&quot;)) return null;</b>
+<b class="fc">&nbsp;    UserDTO accessor = result.getObject(&quot;data&quot;, UserDTO.class);</b>
+&nbsp;
+<b class="fc">&nbsp;    if (order.getType() == 0) {</b>
+&nbsp;      // 向Task module请求task信息
+<b class="fc">&nbsp;      result = taskClient.getTaskById(order.getItemId());</b>
+<b class="fc">&nbsp;      if(!result.getBoolean(&quot;ok&quot;)) return null;</b>
+<b class="fc">&nbsp;      TaskDTO task = result.getObject(&quot;data&quot;, TaskDTO.class);</b>
+<b class="fc">&nbsp;      orderDTO.setTask(task);</b>
+&nbsp;    } else {
+&nbsp;      // 向Service module请求service信息
+<b class="fc">&nbsp;      result = serviceClient.getServiceById(order.getItemId());</b>
+<b class="fc">&nbsp;      if(!result.getBoolean(&quot;ok&quot;)) return null;</b>
+<b class="fc">&nbsp;      ServiceDTO service = result.getObject(&quot;data&quot;, ServiceDTO.class);</b>
+<b class="fc">&nbsp;      orderDTO.setService(service);</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    orderDTO.setOrder(order);</b>
+<b class="fc">&nbsp;    orderDTO.setOwner(owner);</b>
+<b class="fc">&nbsp;    orderDTO.setAccessor(accessor);</b>
+&nbsp;
+<b class="fc">&nbsp;    return orderDTO;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public void mapOrdersToOrderDTOs(List&lt;Order&gt; orders, List&lt;OrderDTO&gt; orderDTOs) {
+<b class="fc">&nbsp;    for (Order order : orders) {</b>
+<b class="fc">&nbsp;      OrderDTO orderDTO = this.mapOrderToOrderDTO(order);</b>
+<b class="fc">&nbsp;      if (orderDTO != null) {</b>
+<b class="fc">&nbsp;        orderDTOs.add(orderDTO);</b>
+&nbsp;      }
+&nbsp;    }
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public Pair&lt;Boolean, String&gt; markOrderStatus(long orderId, long userId, OrderStatus status) {
+<b class="fc">&nbsp;    Order order = orderDao.findById(orderId);</b>
+<b class="fc">&nbsp;    if (order == null) {</b>
+<b class="fc">&nbsp;      return Pair.of(false, &quot;订单不存在&quot;);</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    OrderStatus currentStatus = order.getStatus();</b>
+<b class="fc">&nbsp;    if (currentStatus == OrderStatus.UNPAID &amp;&amp; status == OrderStatus.IN_PROGRESS &amp;&amp; userId == order.getOwnerId()) {</b>
+<b class="fc">&nbsp;      return this.payOrder(order) ? Pair.of(true, &quot;订单支付成功&quot;) : Pair.of(false, &quot;订单支付失败&quot;);</b>
+<b class="fc">&nbsp;    } else if (currentStatus == OrderStatus.IN_PROGRESS &amp;&amp; status == OrderStatus.COMPLETED &amp;&amp; userId == order.getAccessorId()) {</b>
+<b class="fc">&nbsp;      return this.completeOrder(order) ? Pair.of(true, &quot;订单完成成功&quot;) : Pair.of(false, &quot;订单完成失败&quot;);</b>
+<b class="fc">&nbsp;    } else if (currentStatus == OrderStatus.COMPLETED &amp;&amp; status == OrderStatus.CONFIRMED &amp;&amp; userId == order.getOwnerId()) {</b>
+<b class="fc">&nbsp;      return this.confirmOrder(order) ? Pair.of(true, &quot;订单确认成功&quot;) : Pair.of(false, &quot;订单确认失败&quot;);</b>
+<b class="fc">&nbsp;    } else if (status == OrderStatus.CANCELLED &amp;&amp; currentStatus != OrderStatus.CONFIRMED &amp;&amp; currentStatus != OrderStatus.CANCELLED &amp;&amp; userId == order.getOwnerId()) {</b>
+<b class="fc">&nbsp;      return this.cancelOrder(order) ? Pair.of(true, &quot;订单取消成功&quot;) : Pair.of(false, &quot;订单取消失败&quot;);</b>
+&nbsp;    } else {
+<b class="fc">&nbsp;      return Pair.of(false, &quot;订单状态不合法&quot;);</b>
+&nbsp;    }
+&nbsp;  }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-08-07 20:24</div>
+</div>
+</body>
+</html>

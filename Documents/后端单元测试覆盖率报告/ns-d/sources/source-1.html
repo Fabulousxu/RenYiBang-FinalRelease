@@ -1,0 +1,132 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > ServiceService</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.renyibang.serviceapi.service</a>
+</div>
+
+<h1>Coverage Summary for Class: ServiceService (com.renyibang.serviceapi.service)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">ServiceService</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.renyibang.serviceapi.service;
+&nbsp;
+&nbsp;import com.alibaba.fastjson2.JSONObject;
+&nbsp;import org.springframework.data.domain.Pageable;
+&nbsp;import org.springframework.stereotype.Service;
+&nbsp;
+&nbsp;@Service
+&nbsp;public interface ServiceService {
+&nbsp;    JSONObject searchServiceByPaging(String keyword, Pageable pageable, String timeBegin, String timeEnd, long priceLow, long priceHigh, long userId);
+&nbsp;
+&nbsp;    JSONObject getServiceInfo(long serviceId, long userId);
+&nbsp;
+&nbsp;    JSONObject getServiceComments(long serviceId, Pageable pageable, long userId);
+&nbsp;
+&nbsp;    JSONObject getServiceMessages(long serviceId, Pageable pageable, long userId);
+&nbsp;
+&nbsp;    JSONObject likeComment(long serviceCommentId, long likerId);
+&nbsp;
+&nbsp;    JSONObject unlikeComment(long serviceCommentId, long unlikerId);
+&nbsp;
+&nbsp;    JSONObject likeMessage(long serviceMessageId, long likerId);
+&nbsp;
+&nbsp;    JSONObject unlikeMessage(long serviceMessageId, long unlikerId);
+&nbsp;
+&nbsp;    JSONObject collectService(long serviceId, long collectorId);
+&nbsp;
+&nbsp;    JSONObject uncollectService(long serviceId, long uncollectorId);
+&nbsp;
+&nbsp;    JSONObject accessService(long serviceId, long accessorId);
+&nbsp;
+&nbsp;    JSONObject unaccessService(long serviceId, long unaccessorId);
+&nbsp;
+&nbsp;    JSONObject publishMessage(long serviceId, long userId, JSONObject body);
+&nbsp;
+&nbsp;    JSONObject deleteMessage(long serviceMessageId, long userId);
+&nbsp;
+&nbsp;    JSONObject publishComment(long serviceId, long userId, JSONObject body);
+&nbsp;
+&nbsp;    JSONObject deleteComment(long serviceCommentId, long userId);
+&nbsp;
+&nbsp;    JSONObject publishService(long userId, JSONObject body);
+&nbsp;
+&nbsp;    JSONObject getServiceDtoById(Long serviceId);
+&nbsp;
+&nbsp;    JSONObject getServiceOwnerId(long serviceId);
+&nbsp;
+&nbsp;    JSONObject getMyService(Pageable pageable, long userId);
+&nbsp;
+&nbsp;    JSONObject getMyAccessedService(Pageable pageable, long userId);
+&nbsp;
+&nbsp;    JSONObject getServiceAccessorInfo(long serviceId, long userId, Pageable pageable);
+&nbsp;
+&nbsp;    JSONObject cancelService(long serviceId, long userId);
+&nbsp;
+&nbsp;    JSONObject confirmAccessors(long serviceId, long userId, JSONObject body);
+&nbsp;
+&nbsp;    JSONObject getServiceAccessorSuccess(long taskId, long userId, Pageable pageable);
+&nbsp;
+&nbsp;    JSONObject getServiceAccessorFail(long taskId, long userId, Pageable pageable);
+&nbsp;
+&nbsp;    JSONObject denyAccessors(long taskId, long userId, JSONObject body);
+&nbsp;
+&nbsp;    JSONObject getMyCollect(Pageable pageable, long userId);
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-08-07 20:24</div>
+</div>
+</body>
+</html>

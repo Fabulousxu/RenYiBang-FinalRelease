@@ -1,0 +1,320 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > TaskController</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.renyibang.taskapi.controller</a>
+</div>
+
+<h1>Coverage Summary for Class: TaskController (com.renyibang.taskapi.controller)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TaskController</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (29/29)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (40/40)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (46/46)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.renyibang.taskapi.controller;
+&nbsp;
+&nbsp;import com.alibaba.fastjson2.JSONObject;
+&nbsp;import com.renyibang.taskapi.service.TaskService;
+&nbsp;import com.renyibang.taskapi.util.ResponseUtil;
+&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+&nbsp;import org.springframework.data.domain.PageRequest;
+&nbsp;import org.springframework.data.domain.Sort;
+&nbsp;import org.springframework.web.bind.annotation.*;
+&nbsp;
+&nbsp;import java.util.Objects;
+&nbsp;
+&nbsp;@RestController
+&nbsp;@RequestMapping(&quot;/api/task&quot;)
+<b class="fc">&nbsp;public class TaskController {</b>
+&nbsp;  @Autowired TaskService taskService;
+&nbsp;
+&nbsp;  @GetMapping(&quot;/search&quot;)
+&nbsp;  public JSONObject searchTask(
+&nbsp;      String keyword,
+&nbsp;      int pageSize,
+&nbsp;      int pageIndex,
+&nbsp;      String order,
+&nbsp;      String timeBegin,
+&nbsp;      String timeEnd,
+&nbsp;      long priceLow,
+&nbsp;      long priceHigh,
+&nbsp;      @RequestHeader long userId) {
+&nbsp;    Sort sort;
+<b class="fc">&nbsp;    if (Objects.equals(order, &quot;time&quot;) &amp;&amp; !keyword.isEmpty()) sort = Sort.by(&quot;created_at&quot;).descending();</b>
+<b class="fc">&nbsp;    else if (Objects.equals(order, &quot;time&quot;)) sort = Sort.by(&quot;createdAt&quot;).descending();</b>
+<b class="fc">&nbsp;    else if (Objects.equals(order, &quot;rating&quot;)) sort = Sort.by(&quot;rating&quot;).descending();</b>
+<b class="fc">&nbsp;    else return ResponseUtil.error(&quot;排序类型错误&quot;);</b>
+<b class="fc">&nbsp;    if (pageSize &lt;= 0 || pageIndex &lt; 0) return ResponseUtil.error(&quot;分页错误&quot;);</b>
+<b class="fc">&nbsp;    return taskService.searchTaskByPaging(</b>
+&nbsp;        keyword,
+<b class="fc">&nbsp;        PageRequest.of(pageIndex, pageSize, sort),</b>
+&nbsp;        timeBegin,
+&nbsp;        timeEnd,
+&nbsp;        priceLow,
+&nbsp;        priceHigh,
+&nbsp;        userId);
+&nbsp;  }
+&nbsp;
+&nbsp;  @GetMapping(&quot;/{taskId}&quot;)
+&nbsp;  public JSONObject getTaskInfo(@PathVariable long taskId, @RequestHeader long userId) {
+<b class="fc">&nbsp;    return taskService.getTaskInfo(taskId, userId);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @GetMapping(&quot;/{taskId}/comment&quot;)
+&nbsp;  public JSONObject getTaskComment(
+&nbsp;      @PathVariable long taskId,
+&nbsp;      int pageSize,
+&nbsp;      int pageIndex,
+&nbsp;      String order,
+&nbsp;      @RequestHeader long userId) {
+&nbsp;    Sort sort;
+<b class="fc">&nbsp;    if (Objects.equals(order, &quot;likes&quot;)) sort = Sort.by(&quot;likedNumber&quot;).descending();</b>
+<b class="fc">&nbsp;    else if (Objects.equals(order, &quot;time&quot;)) sort = Sort.by(&quot;createdAt&quot;).descending();</b>
+<b class="fc">&nbsp;    else return ResponseUtil.error(&quot;排序类型错误&quot;);</b>
+<b class="fc">&nbsp;    if (pageSize &lt;= 0 || pageIndex &lt; 0) return ResponseUtil.error(&quot;分页错误&quot;);</b>
+<b class="fc">&nbsp;    return taskService.getTaskComments(taskId, PageRequest.of(pageIndex, pageSize, sort), userId);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @GetMapping(&quot;/{taskId}/message&quot;)
+&nbsp;  public JSONObject getTaskMessage(
+&nbsp;      @PathVariable long taskId,
+&nbsp;      int pageSize,
+&nbsp;      int pageIndex,
+&nbsp;      String order,
+&nbsp;      @RequestHeader long userId) {
+&nbsp;    Sort sort;
+<b class="fc">&nbsp;    if (Objects.equals(order, &quot;likes&quot;)) sort = Sort.by(&quot;likedNumber&quot;).descending();</b>
+<b class="fc">&nbsp;    else if (Objects.equals(order, &quot;time&quot;)) sort = Sort.by(&quot;createdAt&quot;).descending();</b>
+<b class="fc">&nbsp;    else return ResponseUtil.error(&quot;排序类型错误&quot;);</b>
+<b class="fc">&nbsp;    if (pageSize &lt;= 0 || pageIndex &lt; 0) return ResponseUtil.error(&quot;分页错误&quot;);</b>
+<b class="fc">&nbsp;    return taskService.getTaskMessages(taskId, PageRequest.of(pageIndex, pageSize, sort), userId);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @PutMapping(&quot;/comment/{taskCommentId}/like&quot;)
+&nbsp;  public JSONObject likeComment(@PathVariable long taskCommentId, @RequestHeader long userId) {
+<b class="fc">&nbsp;    return taskService.likeComment(taskCommentId, userId);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @DeleteMapping(&quot;/comment/{taskCommentId}/unlike&quot;)
+&nbsp;  public JSONObject unlikeComment(@PathVariable long taskCommentId, @RequestHeader long userId) {
+<b class="fc">&nbsp;    return taskService.unlikeComment(taskCommentId, userId);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @PutMapping(&quot;/message/{taskMessageId}/like&quot;)
+&nbsp;  public JSONObject likeMessage(@PathVariable long taskMessageId, @RequestHeader long userId) {
+<b class="fc">&nbsp;    return taskService.likeMessage(taskMessageId, userId);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @DeleteMapping(&quot;/message/{taskMessageId}/unlike&quot;)
+&nbsp;  public JSONObject unlikeMessage(@PathVariable long taskMessageId, @RequestHeader long userId) {
+<b class="fc">&nbsp;    return taskService.unlikeMessage(taskMessageId, userId);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @PutMapping(&quot;/{taskId}/collect&quot;)
+&nbsp;  public JSONObject collectTask(@PathVariable long taskId, @RequestHeader long userId) {
+<b class="fc">&nbsp;    return taskService.collectTask(taskId, userId);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @DeleteMapping(&quot;/{taskId}/uncollect&quot;)
+&nbsp;  public JSONObject uncollectTask(@PathVariable long taskId, @RequestHeader long userId) {
+<b class="fc">&nbsp;    return taskService.uncollectTask(taskId, userId);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @PutMapping(&quot;/{taskId}/access&quot;)
+&nbsp;  public JSONObject accessTask(@PathVariable long taskId, @RequestHeader long userId) {
+<b class="fc">&nbsp;    return taskService.accessTask(taskId, userId);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @DeleteMapping(&quot;/{taskId}/unaccess&quot;)
+&nbsp;  public JSONObject unaccessTask(@PathVariable long taskId, @RequestHeader long userId) {
+<b class="fc">&nbsp;    return taskService.unaccessTask(taskId, userId);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @PutMapping(&quot;/{taskId}/message&quot;)
+&nbsp;  public JSONObject publishMessage(
+&nbsp;      @PathVariable long taskId, @RequestBody JSONObject body, @RequestHeader long userId) {
+<b class="fc">&nbsp;    return taskService.publishMessage(taskId, userId, body);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @DeleteMapping(&quot;/message/{taskMessageId}&quot;)
+&nbsp;  public JSONObject deleteMessage(@PathVariable long taskMessageId, @RequestHeader long userId) {
+<b class="fc">&nbsp;    return taskService.deleteMessage(taskMessageId, userId);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @PutMapping(&quot;/{taskId}/comment&quot;)
+&nbsp;  public JSONObject publishComment(
+&nbsp;      @PathVariable long taskId, @RequestBody JSONObject body, @RequestHeader long userId) {
+<b class="fc">&nbsp;    return taskService.publishComment(taskId, userId, body);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @DeleteMapping(&quot;/comment/{taskCommentId}&quot;)
+&nbsp;  public JSONObject deleteComment(@PathVariable long taskCommentId, @RequestHeader long userId) {
+<b class="fc">&nbsp;    return taskService.deleteComment(taskCommentId, userId);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @PostMapping(&quot;/issue&quot;)
+&nbsp;  public JSONObject publishTask(@RequestBody JSONObject body, @RequestHeader long userId) {
+<b class="fc">&nbsp;    return taskService.publishTask(userId, body);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @GetMapping(&quot;/getTask/{taskId}&quot;)
+&nbsp;  public JSONObject getTaskDtoById(@PathVariable Long taskId) {
+<b class="fc">&nbsp;    return taskService.getTaskDtoById(taskId);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @GetMapping(&quot;/{taskId}/ownerId&quot;)
+&nbsp;  public JSONObject getTaskOwnerId(@PathVariable long taskId) {
+<b class="fc">&nbsp;    return taskService.getTaskOwnerId(taskId);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @GetMapping(&quot;/initiator/self&quot;)
+&nbsp;  public JSONObject getMyTask(int pageSize, int pageIndex, @RequestHeader long userId) {
+<b class="fc">&nbsp;    if (pageSize &lt;= 0 || pageIndex &lt; 0) return ResponseUtil.error(&quot;分页错误&quot;);</b>
+<b class="fc">&nbsp;    return taskService.getMyTask(PageRequest.of(pageIndex, pageSize), userId);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @GetMapping(&quot;/recipient/self&quot;)
+&nbsp;  public JSONObject getMyAccessedTask(int pageSize, int pageIndex, @RequestHeader long userId) {
+<b class="fc">&nbsp;    if (pageSize &lt;= 0 || pageIndex &lt; 0) return ResponseUtil.error(&quot;分页错误&quot;);</b>
+<b class="fc">&nbsp;    return taskService.getMyAccessedTask(PageRequest.of(pageIndex, pageSize), userId);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @GetMapping(&quot;/{taskId}/select/info&quot;)
+&nbsp;  public JSONObject getTaskAccessorInfo(@PathVariable long taskId, @RequestHeader long userId, int pageSize, int pageIndex) {
+<b class="fc">&nbsp;    return taskService.getTaskAccessorInfo(taskId, userId, PageRequest.of(pageIndex, pageSize));</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @GetMapping(&quot;/{taskId}/select/success&quot;)
+&nbsp;  public JSONObject getTaskAccessorSuccess(@PathVariable long taskId, @RequestHeader long userId, int pageSize, int pageIndex) {
+<b class="fc">&nbsp;    return taskService.getTaskAccessorSuccess(taskId, userId, PageRequest.of(pageIndex, pageSize));</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @GetMapping(&quot;/{taskId}/select/fail&quot;)
+&nbsp;  public JSONObject getTaskAccessorFail(@PathVariable long taskId, @RequestHeader long userId, int pageSize, int pageIndex) {
+<b class="fc">&nbsp;    return taskService.getTaskAccessorFail(taskId, userId, PageRequest.of(pageIndex, pageSize));</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @DeleteMapping(&quot;/{taskId}/cancel&quot;)
+&nbsp;  public JSONObject cancelTask(@PathVariable long taskId, @RequestHeader long userId) {
+<b class="fc">&nbsp;    return taskService.cancelTask(taskId, userId);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @PutMapping(&quot;/{taskId}/select/confirm&quot;)
+&nbsp;  public JSONObject confirmAccessors(@PathVariable long taskId, @RequestHeader long userId, @RequestBody JSONObject body) {
+<b class="fc">&nbsp;    return taskService.confirmAccessors(taskId, userId, body);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @PutMapping(&quot;/{taskId}/select/deny&quot;)
+&nbsp;  public JSONObject denyAccessors(@PathVariable long taskId, @RequestHeader long userId, @RequestBody JSONObject body) {
+<b class="fc">&nbsp;    return taskService.denyAccessors(taskId, userId, body);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @GetMapping(&quot;/mycollect&quot;)
+&nbsp;  public JSONObject getMyCollect(int pageSize, int pageIndex, @RequestHeader long userId) {
+<b class="fc">&nbsp;    if (pageSize &lt;= 0 || pageIndex &lt; 0) return ResponseUtil.error(&quot;分页错误&quot;);</b>
+<b class="fc">&nbsp;    return taskService.getMyCollect(PageRequest.of(pageIndex, pageSize), userId);</b>
+&nbsp;  }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-08-07 20:24</div>
+</div>
+</body>
+</html>

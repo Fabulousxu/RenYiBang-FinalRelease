@@ -1,0 +1,250 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > OrderController</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.renyibang.orderapi.controller</a>
+</div>
+
+<h1>Coverage Summary for Class: OrderController (com.renyibang.orderapi.controller)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">OrderController</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (10/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (14/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (43/43)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.renyibang.orderapi.controller;
+&nbsp;
+&nbsp;import com.alibaba.fastjson2.JSONObject;
+&nbsp;import com.renyibang.global.client.TaskClient;
+&nbsp;import com.renyibang.orderapi.dto.OrderDTO;
+&nbsp;import com.renyibang.orderapi.enums.OrderStatus;
+&nbsp;import com.renyibang.orderapi.service.OrderService;
+&nbsp;import com.renyibang.orderapi.util.ResponseUtil;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+&nbsp;import org.springframework.data.util.Pair;
+&nbsp;import org.springframework.web.bind.annotation.GetMapping;
+&nbsp;import org.springframework.web.bind.annotation.PathVariable;
+&nbsp;import org.springframework.web.bind.annotation.PostMapping;
+&nbsp;import org.springframework.web.bind.annotation.PutMapping;
+&nbsp;import org.springframework.web.bind.annotation.RequestBody;
+&nbsp;import org.springframework.web.bind.annotation.RequestHeader;
+&nbsp;import org.springframework.web.bind.annotation.RequestMapping;
+&nbsp;import org.springframework.web.bind.annotation.RequestParam;
+&nbsp;import org.springframework.web.bind.annotation.RestController;
+&nbsp;
+&nbsp;@RestController
+&nbsp;@RequestMapping(&quot;/api/order&quot;)
+<b class="fc">&nbsp;public class OrderController {</b>
+&nbsp;  @Autowired
+&nbsp;  private OrderService orderService;
+&nbsp;
+&nbsp;  // 生成订单
+&nbsp;  // /task/create
+&nbsp;  // Long taskId, Long ownerId, Long accessorId, Long cost
+&nbsp;  // token中的userId
+&nbsp;  @PutMapping(&quot;/task/create&quot;)
+&nbsp;  public JSONObject createTaskOrder(@RequestBody JSONObject data, @RequestHeader(&quot;userId&quot;) Long userId) {
+<b class="fc">&nbsp;    long taskId = data.getLong(&quot;taskId&quot;);</b>
+<b class="fc">&nbsp;    long ownerId = data.getLong(&quot;ownerId&quot;);</b>
+&nbsp;    // accessor是一个列表
+&nbsp;    // List&lt;Long&gt; accessors
+<b class="fc">&nbsp;    List&lt;Long&gt; accessors = data.getJSONArray(&quot;accessors&quot;).toJavaList(Long.class);</b>
+<b class="fc">&nbsp;    long cost = data.getLong(&quot;cost&quot;);</b>
+&nbsp;    // 校验ownerId是否为当前用户
+<b class="fc">&nbsp;    if (ownerId != userId) {</b>
+<b class="fc">&nbsp;      return ResponseUtil.error(&quot;ownerId不匹配&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // 创建订单
+&nbsp;    try{
+<b class="fc">&nbsp;      orderService.createOrder(taskId, ownerId, accessors, cost, (byte) 0);</b>
+<b class="fc">&nbsp;    } catch (Exception e) {</b>
+<b class="fc">&nbsp;      return ResponseUtil.error(e.getMessage());</b>
+&nbsp;    }
+<b class="fc">&nbsp;    return ResponseUtil.success(&quot;订单创建成功&quot;);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @PutMapping(&quot;/service/create&quot;)
+&nbsp;  public JSONObject createServiceOrder(@RequestBody JSONObject data, @RequestHeader(&quot;userId&quot;) Long userId) {
+<b class="fc">&nbsp;    long serviceId = data.getLong(&quot;serviceId&quot;);</b>
+<b class="fc">&nbsp;    long ownerId = data.getLong(&quot;ownerId&quot;);</b>
+<b class="fc">&nbsp;    List&lt;Long&gt; accessors = data.getJSONArray(&quot;accessors&quot;).toJavaList(Long.class);</b>
+<b class="fc">&nbsp;    long cost = data.getLong(&quot;cost&quot;);</b>
+&nbsp;    // 校验ownerId是否为当前用户
+<b class="fc">&nbsp;    if (ownerId != userId) {</b>
+<b class="fc">&nbsp;      return ResponseUtil.error(&quot;ownerId不匹配&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // 创建订单
+&nbsp;    try{
+<b class="fc">&nbsp;      orderService.createOrder(serviceId, ownerId, accessors, cost, (byte) 1);</b>
+<b class="fc">&nbsp;    } catch (Exception e) {</b>
+<b class="fc">&nbsp;      return ResponseUtil.error(e.getMessage());</b>
+&nbsp;    }
+<b class="fc">&nbsp;    return ResponseUtil.success(&quot;订单创建成功&quot;);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  // 获取指定id的order信息
+&nbsp;  // /api/order/{id}
+&nbsp;  @GetMapping(&quot;/{id}&quot;)
+&nbsp;  public JSONObject getOrder(@PathVariable Long id, @RequestHeader(&quot;userId&quot;) Long userId) {
+&nbsp;    // 身份校验
+<b class="fc">&nbsp;    OrderDTO order = orderService.findById(id);</b>
+<b class="fc">&nbsp;    if(order == null) {</b>
+<b class="fc">&nbsp;      return ResponseUtil.error(&quot;订单不存在&quot;);</b>
+&nbsp;    }
+<b class="fc">&nbsp;    if (order.getOwner().getId() != userId &amp;&amp; order.getAccessor().getId() != userId) {</b>
+<b class="fc">&nbsp;      return ResponseUtil.error(&quot;无权查看订单&quot;);</b>
+&nbsp;    }
+<b class="fc">&nbsp;    return ResponseUtil.success(order.getDetail());</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @GetMapping(&quot;/task/initiator&quot;)
+&nbsp;  public JSONObject getTaskOrderByOwner(@RequestHeader(&quot;userId&quot;) Long userId) {
+<b class="fc">&nbsp;    List&lt;OrderDTO&gt; taskOrders = orderService.findByOwnerIdAndType(userId, (byte) 0);</b>
+<b class="fc">&nbsp;    return ResponseUtil.success(toJSON(taskOrders));</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @GetMapping(&quot;/task/recipient&quot;)
+&nbsp;  public JSONObject getTaskOrderByAccessor(@RequestHeader(&quot;userId&quot;) Long userId) {
+<b class="fc">&nbsp;    List&lt;OrderDTO&gt; taskOrders = orderService.findByAccessorIdAndType(userId, (byte) 0);</b>
+<b class="fc">&nbsp;    return ResponseUtil.success(toJSON(taskOrders));</b>
+&nbsp;  }
+&nbsp;  @GetMapping(&quot;/service/initiator&quot;)
+&nbsp;  public JSONObject getServiceOrderByOwner(@RequestHeader(&quot;userId&quot;) Long userId) {
+<b class="fc">&nbsp;    List&lt;OrderDTO&gt; serviceOrders = orderService.findByOwnerIdAndType(userId, (byte) 1);</b>
+<b class="fc">&nbsp;    return ResponseUtil.success(toJSON(serviceOrders));</b>
+&nbsp;  }
+&nbsp;  @GetMapping(&quot;/service/recipient&quot;)
+&nbsp;  public JSONObject getServiceOrderByAccessor(@RequestHeader(&quot;userId&quot;) Long userId) {
+<b class="fc">&nbsp;    List&lt;OrderDTO&gt; serviceOrders = orderService.findByAccessorIdAndType(userId, (byte) 1);</b>
+<b class="fc">&nbsp;    return ResponseUtil.success(toJSON(serviceOrders));</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  // 任务完成
+&nbsp;  @PostMapping(&quot;/status&quot;)
+&nbsp;  public JSONObject changeOrderStatus(@RequestParam Long orderId, @RequestParam Long status, @RequestHeader(&quot;userId&quot;) Long userId) {
+<b class="fc">&nbsp;    Pair&lt;Boolean, String&gt; result = orderService.markOrderStatus(orderId, userId, OrderStatus.fromCode(Math.toIntExact(status)));</b>
+&nbsp;
+<b class="fc">&nbsp;    if (result.getFirst()) {</b>
+<b class="fc">&nbsp;      return ResponseUtil.success(&quot;订单状态修改成功&quot;);</b>
+&nbsp;    } else {
+<b class="fc">&nbsp;      return ResponseUtil.error(result.getSecond());</b>
+&nbsp;    }
+&nbsp;  }
+&nbsp;
+&nbsp;  // 非接口
+&nbsp;  // 传入List&lt;Order&gt;，对于每一个Order，调用toJSON()方法，返回List&lt;JSONObject&gt;
+&nbsp;  // 使用模板
+&nbsp;  private List&lt;JSONObject&gt; toJSON(List&lt;? extends OrderDTO&gt; orders) {
+<b class="fc">&nbsp;    List&lt;JSONObject&gt; jsonObjects = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;    for (OrderDTO order : orders) {</b>
+<b class="fc">&nbsp;      jsonObjects.add(order.toJSON());</b>
+&nbsp;    }
+<b class="fc">&nbsp;    return jsonObjects;</b>
+&nbsp;  }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-08-07 20:24</div>
+</div>
+</body>
+</html>

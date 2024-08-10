@@ -1,0 +1,2 @@
+server:
+  port: ${TASK_API_2_PORT}

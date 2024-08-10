@@ -1,0 +1,2 @@
+server:
+  port: ${GATEWAY_4_PORT}

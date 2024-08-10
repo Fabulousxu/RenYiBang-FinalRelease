@@ -1,0 +1,2 @@
+server:
+  port: ${USER_API_2_PORT}
